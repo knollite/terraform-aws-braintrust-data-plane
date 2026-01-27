@@ -307,6 +307,12 @@ variable "redis_authorized_security_groups" {
   default     = {}
 }
 
+variable "existing_elasticache_subnet_group_name" {
+  description = "Existing ElastiCache subnet group name to use. If null, one will be created."
+  type        = string
+  default     = null
+}
+
 ## Services
 
 variable "api_handler_provisioned_concurrency" {
