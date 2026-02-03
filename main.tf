@@ -12,6 +12,9 @@ locals {
   bastion_security_group = var.enable_braintrust_support_shell_access ? {
     "Remote Support Bastion" = module.remote_support[0].remote_support_security_group_id
   } : {}
+  instance_connect_endpoint_security_group = var.enable_braintrust_support_shell_access ? {
+    "EC2 Instance Connect Endpoint" = module.remote_support[0].instance_connect_endpoint_security_group_id
+  } : {}
 
   # VPC configuration - handle both created and existing VPCs
   main_vpc_id                  = var.create_vpc ? module.main_vpc[0].vpc_id : var.existing_vpc_id
@@ -295,7 +298,10 @@ module "brainstore" {
     ),
     local.bastion_security_group
   )
-  authorized_security_groups_ssh = local.bastion_security_group
+  authorized_security_groups_ssh = merge(
+    local.bastion_security_group,
+    local.instance_connect_endpoint_security_group
+  )
 
   private_subnet_ids = [
     local.main_vpc_private_subnet_1_id,
@@ -309,6 +315,7 @@ module "brainstore" {
   custom_post_install_script = var.brainstore_custom_post_install_script
   cache_file_size_reader     = var.brainstore_cache_file_size_reader
   cache_file_size_writer     = var.brainstore_cache_file_size_writer
+  locks_s3_path              = var.brainstore_locks_s3_path
 }
 
 
