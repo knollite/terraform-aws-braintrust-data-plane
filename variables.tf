@@ -17,6 +17,16 @@ variable "braintrust_org_name" {
   description = "The name of your organization in Braintrust (e.g. acme.com)"
 }
 
+variable "primary_org_name" {
+  type        = string
+  default     = ""
+  description = "This is only required if you intend have multiple organizations on your data plane. Owners in this organization will have special permissions to manage data plane internals."
+  validation {
+    condition     = var.braintrust_org_name != "*" || trimspace(var.primary_org_name) != ""
+    error_message = "primary_org_name is required when braintrust_org_name is \"*\" (multiple organizations on the data plane)."
+  }
+}
+
 variable "deployment_name" {
   type        = string
   default     = "braintrust"
@@ -280,6 +290,12 @@ variable "existing_database_subnet_group_name" {
   type        = string
   description = "Optionally re-use an existing database subnet group. If not provided, a new subnet group will be created which is the default and preferred behavior."
   default     = null
+}
+
+variable "postgres_backup_retention_period" {
+  description = "Number of days to retain automated RDS backups."
+  type        = number
+  default     = 14
 }
 
 variable "DANGER_disable_database_deletion_protection" {
